@@ -1,0 +1,53 @@
+security:
+    password_hashers:
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: auto
+
+    providers:
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                property: username
+
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        login:
+            pattern: ^/api/login
+            stateless: true
+            security: false  # Disable JWT for this route
+
+        api:
+            pattern: ^/api
+            stateless: true
+            jwt: ~  # Activate JWT authentication for all routes starting with /api
+            provider: app_user_provider  # Correct option to define the user provider
+
+
+        main:
+            lazy: true
+            provider: app_user_provider
+            form_login:
+                login_path: app_login
+                check_path: app_login
+                enable_csrf: true
+                default_target_path: app_film_index
+                csrf_token_id: authenticate
+            logout:
+                path: app_logout
+                target: app_login
+            remember_me:
+                secret: '%env(APP_SECRET)%'
+                lifetime: 604800
+                path: /
+            custom_authenticators:
+                - App\Security\LoginFormAuthenticator
+            entry_point: App\Security\LoginFormAuthenticator
+
+    access_control:
+        - { path: ^/api/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }  # Allow everyone to access /api/login
+        - { path: ^/api/comment, roles: ROLE_ADMIN }  # Only admins can access /api/comment
+        - { path: ^/api, roles: ROLE_USER }  # Authenticated users with ROLE_USER can access other /api routes
+        - { path: ^/admin, roles: ROLE_ADMIN }  # Only admins can access /admin
+        - { path: ^/profile, roles: IS_AUTHENTICATED_FULLY }  # Only fully authenticated users can access /profile

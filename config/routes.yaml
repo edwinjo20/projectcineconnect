@@ -1,0 +1,12 @@
+controllers:
+    resource:
+        path: ../src/Controller/
+        namespace: App\Controller
+    type: attribute
+api_comment_approve:
+    path: /api/comment/approve/{id}
+    controller: App\Controller\Api\CommentApiController::approve
+
+api_comment_delete:
+    path: /api/comment/delete/{id}
+    controller: App\Controller\Api\CommentApiController::delete

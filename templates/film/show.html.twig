@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>{{ film.title }}</h1>
+    <p>{{ film.description }}</p>
+    <p>Release Date: {{ film.releaseDate|date('Y-m-d') }}</p>
+    <p>Genre: {{ film.genre.name }}</p>
+
+    <h2>Reviews</h2>
+    {% for review in reviews %}
+        <div>
+            <p>{{ review.user.username }} - Rating: {{ review.ratingGiven }}/10</p>
+            <p>{{ review.content }}</p>
+            <p><small>Posted on {{ review.publicationDate|date('Y-m-d H:i') }}</small></p>
+
+            {# Edit and Delete Buttons for Review #}
+            {% if review.user == app.user or is_granted('ROLE_ADMIN') %}
+                <a href="{{ path('app_review_edit', {'id': review.id}) }}">Edit</a> |
+                <form action="{{ path('app_review_delete', {'id': review.id}) }}" method="POST" style="display:inline;">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ review.id) }}">
+                    <button type="submit">Delete</button>
+                </form>
+            {% endif %}
+
+            {# Comments Section - Show/Hide Comments for Each Review #}
+            <button onclick="toggleComments({{ review.id }})">See All Comments</button>
+            <div id="comments-{{ review.id }}" style="display:none;">
+                <h4>Comments</h4>
+                {% for comment in review.comments %}
+                    <div>
+                        <p><strong>{{ comment.user.username }}</strong>: {{ comment.content }}</p>
+                        <p><small>Posted on {{ comment.date|date('Y-m-d H:i') }}</small></p>
+                    </div>
+                {% endfor %}
+            </div>
+            <br>
+
+            {# For each review, render the corresponding comment form #}
+            <div id="comment-form-{{ review.id }}" style="display:none;">
+                <h5>Leave a Comment</h5>
+                {{ form_start(commentForms[review.id]) }}
+                {{ form_row(commentForms[review.id].content) }}
+                <button type="submit">Submit Comment</button>
+                {{ form_end(commentForms[review.id]) }}
+            </div>
+            <button onclick="document.getElementById('comment-form-{{ review.id }}').style.display='block'">Add Comment</button>
+        </div>
+    {% endfor %}
+
+    <h3>Add a Review</h3>
+    {{ form_start(reviewForm) }}
+    {{ form_row(reviewForm.content) }}
+    {{ form_row(reviewForm.ratingGiven) }}
+    <button type="submit">Submit Review</button>
+    {{ form_end(reviewForm) }}
+
+<script>
+    function toggleComments(reviewId) {
+        var commentsDiv = document.getElementById('comments-' + reviewId);
+        if (commentsDiv.style.display === "none") {
+            commentsDiv.style.display = "block";
+        } else {
+            commentsDiv.style.display = "none";
+        }
+    }
+</script>
+{% endblock %}

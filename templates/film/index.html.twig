@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Film index{% endblock %}
+
+{% block body %}
+    <h1>Film index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Description</th>
+                <th>ReleaseDate</th>
+                <th>ImagePath</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for film in films %}
+            <tr>
+                <td>{{ film.title }}</td>
+                <td>{{ film.description }}</td>
+                <td>{{ film.releaseDate ? film.releaseDate|date('Y-m-d') : '' }}</td>
+                <td>{{ film.imagePath }}</td>
+                <td>
+                    <a href="{{ path('app_film_show', {'id': film.id}) }}">show</a>
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <a href="{{ path('app_film_edit', {'id': film.id}) }}">edit</a>
+                    {% endif %}
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    {% if is_granted('ROLE_ADMIN') %}
+        <a href="{{ path('app_film_new') }}">Create new</a>
+    {% endif %}
+{% endblock %}

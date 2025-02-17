@@ -1,0 +1,13 @@
+# see https://symfony.com/doc/current/reference/configuration/framework.html
+framework:
+    secret: '%env(APP_SECRET)%'  # Reference the APP_SECRET from .env
+    session:
+        handler_id: null  # Default session handler
+        cookie_secure: auto  # Set to 'true' if using HTTPS
+        cookie_samesite: lax  # Ensures cookies are sent for same-site requests
+        storage_factory_id: 'session.storage.factory.native'  # Use native session storage
+when@test:
+    framework:
+        test: true
+        session:
+            storage_factory_id: 'session.storage.factory.mock_file'

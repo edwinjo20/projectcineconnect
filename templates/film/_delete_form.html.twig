@@ -1,0 +1,5 @@
+{# In the Film Index template, make sure the delete form includes a CSRF token #}
+<form method="post" action="{{ path('app_film_delete', {'id': film.id}) }}">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ film.id) }}">
+    <button type="submit">Delete</button>
+</form>
